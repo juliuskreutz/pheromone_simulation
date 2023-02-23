@@ -2,6 +2,7 @@
 
 use std::{collections::HashMap, fs, iter, mem, time::Instant};
 
+use anyhow::Result;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use wgpu::{include_wgsl, util::DeviceExt};
@@ -13,7 +14,7 @@ use winit::{
 };
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, bytemuck::Pod, bytemuck::Zeroable)]
+#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 struct Vertex {
     position: [f32; 2],
     tex_coords: [f32; 2],
@@ -70,8 +71,11 @@ struct SpeciesSettings {
     diffuse_rate: f32,
 }
 
-#[tokio::main]
-async fn main() {
+fn main() -> Result<()> {
+    pollster::block_on(run())
+}
+
+async fn run() -> Result<()> {
     let settings: Settings = toml::from_str(&fs::read_to_string("settings.toml").unwrap()).unwrap();
 
     let event_loop = EventLoop::new();
@@ -87,8 +91,12 @@ async fn main() {
     let window = window_builder.build(&event_loop).unwrap();
     let PhysicalSize { width, height } = window.inner_size();
 
-    let instance = wgpu::Instance::new(wgpu::Backends::all());
-    let surface = unsafe { instance.create_surface(&window) };
+    let instance_descriptor = wgpu::InstanceDescriptor {
+        backends: wgpu::Backends::all(),
+        dx12_shader_compiler: wgpu::Dx12Compiler::default(),
+    };
+    let instance = wgpu::Instance::new(instance_descriptor);
+    let surface = unsafe { instance.create_surface(&window) }?;
 
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions {
@@ -111,12 +119,15 @@ async fn main() {
         .await
         .unwrap();
 
+    let surface_capabilities = surface.get_capabilities(&adapter);
     let config = wgpu::SurfaceConfiguration {
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-        format: surface.get_supported_formats(&adapter)[0],
+        format: surface_capabilities.formats[0],
         width,
         height,
-        present_mode: wgpu::PresentMode::Fifo,
+        present_mode: surface_capabilities.present_modes[0],
+        alpha_mode: surface_capabilities.alpha_modes[0],
+        view_formats: vec![],
     };
     surface.configure(&device, &config);
 
@@ -236,6 +247,7 @@ async fn main() {
         usage: wgpu::TextureUsages::COPY_SRC
             | wgpu::TextureUsages::STORAGE_BINDING
             | wgpu::TextureUsages::TEXTURE_BINDING,
+        view_formats: &[],
     });
 
     let width_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {

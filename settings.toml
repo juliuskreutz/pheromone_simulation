@@ -2,72 +2,72 @@ width = 1920
 height = 1080
 fullscreen = false
 
-#[[species]]
-#name = "white"
-#color = [255, 255, 255]
-#amount = 200000
-#likes = ["white"]
-#hates = []
-#move_speed = 80.0
-#turn_speed = 2.0
-#sensor_angle = 0.5
-#sensor_offset = 35.0
-#sensor_size = 1
-#decay_rate = 0.2
-#diffuse_rate = 3.0
-
 [[species]]
-name = "purple"
-color = [127, 88, 175]
-amount = 60000
-likes = ["purple"]
+name = "white"
+color = [255, 255, 255]
+amount = 200000
+likes = ["white"]
 hates = []
-move_speed = 50.0
+move_speed = 80.0
 turn_speed = 2.0
-sensor_angle = 0.6
+sensor_angle = 0.5
 sensor_offset = 35.0
 sensor_size = 1
-decay_rate = 0.1
-diffuse_rate = 6.0
-
-[[species]]
-name = "pink"
-color = [232, 77, 138]
-amount = 50000
-likes = ["pink","yellow"]
-hates = ["blue","purple"]
-move_speed = 50.0
-turn_speed = 2.0
-sensor_angle = 1.0
-sensor_offset = 15.0
-sensor_size = 1
-decay_rate = 0.3
+decay_rate = 0.2
 diffuse_rate = 3.0
 
-[[species]]
-name = "blue"
-color = [100, 197, 235]
-amount = 50000
-likes = ["blue","pink"]
-hates = ["purple","yellow"]
-move_speed = 50.0
-turn_speed = 2.0
-sensor_angle = 1.0
-sensor_offset = 15.0
-sensor_size = 1
-decay_rate = 0.3
-diffuse_rate = 3.0
+# [[species]]
+# name = "purple"
+# color = [127, 88, 175]
+# amount = 60000
+# likes = ["purple"]
+# hates = []
+# move_speed = 50.0
+# turn_speed = 2.0
+# sensor_angle = 0.6
+# sensor_offset = 35.0
+# sensor_size = 1
+# decay_rate = 0.1
+# diffuse_rate = 6.0
 
-[[species]]
-name = "yellow"
-color = [254, 179, 38]
-amount = 50000
-likes = ["yellow","blue"]
-hates = ["pink","purple"]
-move_speed = 50.0
-turn_speed = 2.0
-sensor_angle = 1.0
-sensor_offset = 15.0
-sensor_size = 1
-decay_rate = 0.3
-diffuse_rate = 3.0
+# [[species]]
+# name = "pink"
+# color = [232, 77, 138]
+# amount = 50000
+# likes = ["pink","yellow"]
+# hates = ["blue","purple"]
+# move_speed = 50.0
+# turn_speed = 2.0
+# sensor_angle = 1.0
+# sensor_offset = 15.0
+# sensor_size = 1
+# decay_rate = 0.3
+# diffuse_rate = 3.0
+
+# [[species]]
+# name = "blue"
+# color = [100, 197, 235]
+# amount = 50000
+# likes = ["blue","pink"]
+# hates = ["purple","yellow"]
+# move_speed = 50.0
+# turn_speed = 2.0
+# sensor_angle = 1.0
+# sensor_offset = 15.0
+# sensor_size = 1
+# decay_rate = 0.3
+# diffuse_rate = 3.0
+
+# [[species]]
+# name = "yellow"
+# color = [254, 179, 38]
+# amount = 50000
+# likes = ["yellow","blue"]
+# hates = ["pink","purple"]
+# move_speed = 50.0
+# turn_speed = 2.0
+# sensor_angle = 1.0
+# sensor_offset = 15.0
+# sensor_size = 1
+# decay_rate = 0.3
+# diffuse_rate = 3.0

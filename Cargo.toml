@@ -11,19 +11,17 @@ strip = true
 panic = "abort"
 
 [dependencies]
-wgpu = "0.13.1"
-winit = "0.26.1"
-toml = "0.5.9"
+wgpu = "0.15.1"
+winit = "0.28.1"
+toml = "0.7.2"
 rand = "0.8.5"
-
-[dependencies.tokio]
-version = "1.20.1"
-features = ["macros", "rt-multi-thread"]
+anyhow = "1.0.66"
+pollster = "0.3.0"
 
 [dependencies.bytemuck]
-version = "1.11.0"
+version = "1.13.0"
 features = ["derive"]
 
 [dependencies.serde]
-version = "1.0.140"
+version = "1.0.152"
 features = ["derive"]

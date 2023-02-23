@@ -186,8 +186,8 @@ fn main_2(@builtin(global_invocation_id) id: vec3<u32>) {
         }
     }
 
-    let amount = f32(amount);
-    sum /= vec3<f32>(amount, amount, amount);
+    let amount_f32 = f32(amount);
+    sum /= vec3<f32>(amount_f32, amount_f32, amount_f32);
     textureStore(texture, vec2<i32>(id.xy), vec4<f32>(sum, 1.0));
 }
 
