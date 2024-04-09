@@ -1,8 +1,8 @@
 :experimental:
 
-= mandelbrot
+= pheromone_simulation
 
-A pheromone shader written in rust and wlsl using link:https://github.com/gfx-rs/wgpu[wgpu].
+A pheromone shader written in rust and wgsl using link:https://github.com/gfx-rs/wgpu[wgpu].
 
 == Running
 
@@ -16,6 +16,8 @@ A pheromone shader written in rust and wlsl using link:https://github.com/gfx-rs
 |kbd:[Esc]
 |Exit
 
+|===
+
 == Settings
 
-Should be self explanatory
+link:settings.toml[settings.toml] should be self explanatory
