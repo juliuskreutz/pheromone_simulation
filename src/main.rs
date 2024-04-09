@@ -5,11 +5,12 @@ use std::{collections::HashMap, fs, iter, mem, time::Instant};
 use anyhow::Result;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use wgpu::{include_wgsl, util::DeviceExt};
+use wgpu::{include_wgsl, util::DeviceExt, StoreOp};
 use winit::{
     dpi::PhysicalSize,
-    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
+    event::{ElementState, Event, KeyEvent, WindowEvent},
+    event_loop::EventLoop,
+    keyboard::{KeyCode, PhysicalKey},
     window::{Fullscreen, WindowBuilder},
 };
 
@@ -78,7 +79,7 @@ fn main() -> Result<()> {
 async fn run() -> Result<()> {
     let settings: Settings = toml::from_str(&fs::read_to_string("settings.toml").unwrap()).unwrap();
 
-    let event_loop = EventLoop::new();
+    let event_loop = EventLoop::new()?;
     let mut window_builder = WindowBuilder::new().with_resizable(false);
 
     if settings.fullscreen {
@@ -93,10 +94,10 @@ async fn run() -> Result<()> {
 
     let instance_descriptor = wgpu::InstanceDescriptor {
         backends: wgpu::Backends::all(),
-        dx12_shader_compiler: wgpu::Dx12Compiler::default(),
+        ..Default::default()
     };
     let instance = wgpu::Instance::new(instance_descriptor);
-    let surface = unsafe { instance.create_surface(&window) }?;
+    let surface = instance.create_surface(&window)?;
 
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions {
@@ -110,9 +111,9 @@ async fn run() -> Result<()> {
     let (device, queue) = adapter
         .request_device(
             &wgpu::DeviceDescriptor {
-                features: wgpu::Features::TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
-                limits: wgpu::Limits::default(),
-                label: None,
+                required_features: wgpu::Features::TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES
+                    | wgpu::Features::FLOAT32_FILTERABLE,
+                ..Default::default()
             },
             None,
         )
@@ -120,6 +121,7 @@ async fn run() -> Result<()> {
         .unwrap();
 
     let surface_capabilities = surface.get_capabilities(&adapter);
+    // let config = surface.get_default_config(&adapter, width, height).unwrap();
     let config = wgpu::SurfaceConfiguration {
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
         format: surface_capabilities.formats[0],
@@ -128,6 +130,7 @@ async fn run() -> Result<()> {
         present_mode: surface_capabilities.present_modes[0],
         alpha_mode: surface_capabilities.alpha_modes[0],
         view_formats: vec![],
+        desired_maximum_frame_latency: 2,
     };
     surface.configure(&device, &config);
 
@@ -629,24 +632,25 @@ async fn run() -> Result<()> {
 
     let mut start = Instant::now();
 
-    event_loop.run(move |event, _, control_flow| match event {
+    event_loop.run(|event, target| match event {
         Event::WindowEvent {
-            ref event,
+            event:
+                WindowEvent::CloseRequested
+                | WindowEvent::KeyboardInput {
+                    event:
+                        KeyEvent {
+                            state: ElementState::Pressed,
+                            physical_key: PhysicalKey::Code(KeyCode::Escape),
+                            ..
+                        },
+                    ..
+                },
             window_id,
-        } if window_id == window.id() => match event {
-            WindowEvent::CloseRequested
-            | WindowEvent::KeyboardInput {
-                input:
-                    KeyboardInput {
-                        state: ElementState::Pressed,
-                        virtual_keycode: Some(VirtualKeyCode::Escape),
-                        ..
-                    },
-                ..
-            } => *control_flow = ControlFlow::Exit,
-            _ => {}
-        },
-        Event::RedrawRequested(window_id) if window_id == window.id() => {
+        } if window_id == window.id() => target.exit(),
+        Event::WindowEvent {
+            window_id,
+            event: WindowEvent::RedrawRequested,
+        } if window_id == window.id() => {
             let mut encoder =
                 device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
@@ -656,7 +660,7 @@ async fn run() -> Result<()> {
 
             {
                 let mut compute_pass =
-                    encoder.begin_compute_pass(&wgpu::ComputePassDescriptor { label: None });
+                    encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
                 compute_pass.set_bind_group(0, &compute_bind_group, &[]);
 
                 compute_pass.set_pipeline(&main_1_compute_pipeline);
@@ -676,16 +680,15 @@ async fn run() -> Result<()> {
 
             {
                 let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                    label: None,
                     color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                         view: &view,
                         resolve_target: None,
                         ops: wgpu::Operations {
                             load: wgpu::LoadOp::Load,
-                            store: true,
+                            store: StoreOp::Store,
                         },
                     })],
-                    depth_stencil_attachment: None,
+                    ..Default::default()
                 });
 
                 render_pass.set_pipeline(&render_pipeline);
@@ -698,9 +701,11 @@ async fn run() -> Result<()> {
             queue.submit(iter::once(encoder.finish()));
             output.present();
         }
-        Event::MainEventsCleared => {
+        Event::AboutToWait => {
             window.request_redraw();
         }
         _ => {}
-    });
+    })?;
+
+    Ok(())
 }

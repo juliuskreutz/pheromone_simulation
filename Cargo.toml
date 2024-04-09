@@ -11,17 +11,17 @@ strip = true
 panic = "abort"
 
 [dependencies]
-wgpu = "0.15.1"
-winit = "0.28.1"
-toml = "0.7.2"
+wgpu = "0.19.3"
+winit = "0.29.15"
+toml = "0.8.12"
 rand = "0.8.5"
-anyhow = "1.0.66"
+anyhow = "1.0.81"
 pollster = "0.3.0"
 
 [dependencies.bytemuck]
-version = "1.13.0"
+version = "1.15.0"
 features = ["derive"]
 
 [dependencies.serde]
-version = "1.0.152"
+version = "1.0.197"
 features = ["derive"]
