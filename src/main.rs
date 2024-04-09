@@ -120,18 +120,7 @@ async fn run() -> Result<()> {
         .await
         .unwrap();
 
-    let surface_capabilities = surface.get_capabilities(&adapter);
-    // let config = surface.get_default_config(&adapter, width, height).unwrap();
-    let config = wgpu::SurfaceConfiguration {
-        usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-        format: surface_capabilities.formats[0],
-        width,
-        height,
-        present_mode: surface_capabilities.present_modes[0],
-        alpha_mode: surface_capabilities.alpha_modes[0],
-        view_formats: vec![],
-        desired_maximum_frame_latency: 2,
-    };
+    let config = surface.get_default_config(&adapter, width, height).unwrap();
     surface.configure(&device, &config);
 
     let width = settings.width;
